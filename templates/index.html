@@ -14,6 +14,7 @@
             <option value="lookup">Lookup RFC</option>
             <option value="listall">List All RFCs</option>
             <option value="predownload">Pre-download RFC</option>
+            <option value="download">Download RFC</option>
             <option value="shutdown">Shutdown Client</option>
         </select>
         <div id="additional-inputs">
@@ -37,6 +38,11 @@
             });
             const data = await response.json();
             responseDiv.innerText = data.message;
+
+            // If the command is pre-download, display available peers
+            if (data.peers) {
+                displayPeers(data.peers);
+            }
         });
 
         document.getElementById('command').addEventListener('change', function() {
@@ -62,9 +68,31 @@
                     <label for="num">RFC Number:</label>
                     <input type="text" name="num" required>
                 `;
+            } else if (command === 'download') {
+                additionalInputs.innerHTML = `
+                    <label for="num">RFC Number:</label>
+                    <input type="text" name="num" required>
+                    <label for="title">RFC Title:</label>
+                    <input type="text" name="title" required>
+                    <label for="peer_host">Peer Host:</label>
+                    <input type="text" name="peer_host" required>
+                    <label for="peer_port">Peer Port:</label>
+                    <input type="number" name="peer_port" required>
+                `;
             }
             // No additional inputs needed for 'listall' and 'shutdown'
         });
+
+        // Function to display peers
+        function displayPeers(peers) {
+            const peersList = document.createElement('ul');
+            peers.forEach(peer => {
+                const listItem = document.createElement('li');
+                listItem.textContent = `${peer.title} - Host: ${peer.host}, Port: ${peer.port}`;
+                peersList.appendChild(listItem);
+            });
+            additionalInputs.appendChild(peersList);
+        }
 
     </script>
 </body>
