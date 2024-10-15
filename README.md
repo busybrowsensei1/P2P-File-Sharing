@@ -4,6 +4,8 @@ This project implements a decentralized system where peers can share and retriev
 
 ## Architecture
 
+<img width="949" alt="image" src="https://github.com/user-attachments/assets/8bdac6c8-48a5-483d-a409-c257e1e17632">
+
 ## Implementation
 ### Components
 - **Centralized Index Server**: Handles client connections, registers shared files, and helps locate file-hosting peers. 
@@ -26,9 +28,9 @@ This project implements a decentralized system where peers can share and retriev
 
 3. **Get into the client directory and run the client process:**
    ```bash
-  cd client1
-  python app.py
-   ```
+   cd client1
+   python app.py
+   
 Do the same for other clients as well. If you want more clients, copy the client code into another directory and change the port number in app.py.
 
 ## Team:
