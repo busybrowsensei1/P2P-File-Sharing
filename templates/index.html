@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>P2P File System</title>
+</head>
+<body>
+    <h1>P2P File System Client</h1>
+    <form id="command-form">
+        <label for="command">Select Command:</label>
+        <select name="command" id="command">
+            <option value="add">Add RFC</option>
+            <option value="lookup">Lookup RFC</option>
+            <option value="listall">List All RFCs</option>
+            <option value="predownload">Pre-download RFC</option>
+            <option value="shutdown">Shutdown Client</option>
+        </select>
+        <div id="additional-inputs">
+            <!-- Additional inputs will be added here based on the command -->
+        </div>
+        <button type="submit">Execute</button>
+    </form>
+    <div id="response"></div>
+
+    <script>
+        const form = document.getElementById('command-form');
+        const additionalInputs = document.getElementById('additional-inputs');
+        const responseDiv = document.getElementById('response');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(form);
+            const response = await fetch('/execute_command', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await response.json();
+            responseDiv.innerText = data.message;
+        });
+
+        document.getElementById('command').addEventListener('change', function() {
+            additionalInputs.innerHTML = '';
+            const command = this.value;
+
+            if (command === 'add') {
+                additionalInputs.innerHTML = `
+                    <label for="num">RFC Number:</label>
+                    <input type="text" name="num" required>
+                    <label for="title">RFC Title:</label>
+                    <input type="text" name="title" required>
+                `;
+            } else if (command === 'lookup') {
+                additionalInputs.innerHTML = `
+                    <label for="num">RFC Number:</label>
+                    <input type="text" name="num" required>
+                    <label for="title">RFC Title (optional):</label>
+                    <input type="text" name="title">
+                `;
+            } else if (command === 'predownload') {
+                additionalInputs.innerHTML = `
+                    <label for="num">RFC Number:</label>
+                    <input type="text" name="num" required>
+                `;
+            }
+            // No additional inputs needed for 'listall' and 'shutdown'
+        });
+
+    </script>
+</body>
+</html>
