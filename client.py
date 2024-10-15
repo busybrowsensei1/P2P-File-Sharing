@@ -176,8 +176,33 @@ class Client(object):
         msg += f'Host: {socket.gethostname()}\n'
         msg += f'Post: {self.UPLOAD_PORT}\n'
         self.server.sendall(msg.encode())
+        
         lines = self.server.recv(1024).decode().splitlines()
-        return lines  # Return the response for further processing in Flask
+        
+        # Process response
+        response = {}
+        if lines[0].split()[1] == '200':
+            # Successfully looked up, process the peer info
+            peers = []
+            for line in lines[1:]:
+                parts = line.split()
+                if len(parts) >= 3:  # Ensure there are enough parts
+                    peer_info = {
+                        'title': ' '.join(parts[:-2]),  # Title is everything except the last two parts
+                        'host': parts[-2],
+                        'port': int(parts[-1])
+                    }
+                    peers.append(peer_info)
+            response['peers'] = peers
+            response['message'] = 'Successfully retrieved peer info.'
+            response['status'] = 200
+        else:
+            # Handle error responses
+            response['message'] = f"Error: {lines[0]}"
+            response['status'] = 400
+
+        return response  # Return structured response
+
 
     def shutdown(self):
         print('\nShutting Down...')
@@ -189,26 +214,24 @@ class Client(object):
 
     def download(self, num, title, peer_host, peer_port):
         try:
-            # make connnection
+            # Establish connection with the peer
             soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            # connect_ex return errors
             if soc.connect_ex((peer_host, peer_port)):
-                # print('Try Local Network...')
-                # if soc.connect_ex(('localhost', peer_port)):
                 raise MyException('Peer Not Available')
-            # make request
-            msg = 'GET RFC %s %s\n' % (num, self.V)
-            msg += 'Host: %s\n' % socket.gethostname()
-            msg += 'OS: %s\n' % platform.platform()
+
+            # Send GET request to the peer
+            msg = f'GET RFC {num} {self.V}\n'
+            msg += f'Host: {socket.gethostname()}\n'
+            msg += f'OS: {platform.platform()}\n'
             soc.sendall(msg.encode())
 
-            # Downloading
-
+            # Handle the downloading
             header = soc.recv(1024).decode()
-            print('Recieve response header: \n%s' % header)
-            header = header.splitlines()
-            if header[0].split()[-2] == '200':
-                path = '%s/rfc%s.txt' % (self.DIR, num)
+            print('Received response header:\n%s' % header)
+            header_lines = header.splitlines()
+
+            if header_lines[0].split()[-2] == '200':
+                path = f'{self.DIR}/rfc{num}.txt'
                 print('Downloading...')
                 try:
                     with open(path, 'w') as file:
@@ -216,30 +239,27 @@ class Client(object):
                         while content:
                             file.write(content.decode())
                             content = soc.recv(1024)
+
+                    print('Download completed.')
+                    # Optionally add the RFC to the server after downloading
+                    if self.shareable:
+                        self.add(num, title)
                 except Exception:
                     raise MyException('Downloading Failed')
 
-                total_length = int(header[4].split()[1])
-                # print('write: %s | total: %s' % (os.path.getsize(path), total_length))
-
+                total_length = int(header_lines[4].split()[1])
                 if os.path.getsize(path) < total_length:
-                    raise MyException('Downloading Failed')
+                    raise MyException('Incomplete Download.')
 
-                print('Downloading Completed.')
-                # Share file, send ADD request
-                print('Sending ADD request to share...')
-                if self.shareable:
-                    self.add(num, title)
-            elif header[0].split()[1] == '400':
+                print('Downloading completed and file saved.')
+            elif header_lines[0].split()[1] == '400':
                 raise MyException('Invalid Input.')
-            elif header[0].split()[1] == '404':
+            elif header_lines[0].split()[1] == '404':
                 raise MyException('File Not Available.')
-            elif header[0].split()[1] == '500':
+            elif header_lines[0].split()[1] == '500':
                 raise MyException('Version Not Supported.')
         finally:
             soc.close()
-            # Restore CLI
-          #  print('\n1: Add, 2: Look Up, 3: List All, 4: Download\nEnter your request: ')
 
     def invalid_input(self):
         raise MyException('Invalid Input.')
