@@ -25,10 +25,10 @@ This project implements a decentralized system where peers can share and retriev
    python server.py
 
 3. **Get into the client directory and run the client process:**
-  ```bash
+   ```bash
   cd client1
   python app.py
-  ```
+   ```
 Do the same for other clients as well. If you want more clients, copy the client code into another directory and change the port number in app.py.
 
 ## Team:
