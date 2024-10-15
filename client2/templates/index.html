@@ -4,6 +4,132 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>P2P File System</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f0f0f5;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction:column ;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #333;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 2.5em;
+            margin-bottom: 8vh;
+            letter-spacing: 1px;
+        }
+
+        form {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            max-width: 450px;
+            width: 100%;
+            transition: transform 0.2s ease-in-out;
+        }
+
+        form:hover {
+            transform: scale(1.02);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            font-size: 1em;
+            color: #34495e;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 2px solid #ecf0f1;
+            border-radius: 6px;
+            font-size: 1em;
+            color: #2c3e50;
+            background-color: #f9f9f9;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #3498db;
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            letter-spacing: 1px;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        #response {
+            margin-top: 5vh;
+            padding: 15px;
+            background-color: #e8f5e9;
+            border-left: 5px solid #27ae60;
+            color: #2c3e50;
+            border-radius: 6px;
+            font-size: 1.1em;
+        }
+        #command-form {
+            margin : 5vh;
+        }
+        #additional-inputs {
+            margin-bottom: 15px;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            background-color: #f9f9f9;
+            padding: 12px;
+            margin: 8px 0;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1em;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        li span {
+            font-weight: bold;
+        }
+
+        @media (max-width: 600px) {
+            form {
+                padding: 20px;
+                max-width: 90%;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
 </head>
 <body>
     <h1>P2P File System Client</h1>
@@ -88,7 +214,7 @@
             const peersList = document.createElement('ul');
             peers.forEach(peer => {
                 const listItem = document.createElement('li');
-                listItem.textContent = `${peer.title} - Host: ${peer.host}, Port: ${peer.port}`;
+                listItem.innerHTML = `<span>${peer.title}</span> - Host: ${peer.host}, Port: ${peer.port}`;
                 peersList.appendChild(listItem);
             });
             additionalInputs.appendChild(peersList);
